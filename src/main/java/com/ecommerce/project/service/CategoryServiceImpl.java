@@ -4,8 +4,8 @@ package com.ecommerce.project.service;
 import com.ecommerce.project.exceptions.APIException;
 import com.ecommerce.project.exceptions.ResourceNotFoundException;
 import com.ecommerce.project.model.Category;
+import com.ecommerce.project.payload.CategoryDTO;
 import com.ecommerce.project.payload.CategoryResponse;
-import com.ecommerce.project.payload.CatgegoryDTO;
 import com.ecommerce.project.repository.CategoryRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +39,8 @@ public class CategoryServiceImpl implements CategoryService {
             throw new APIException("No Category created till now");
         }
 
-        List<CatgegoryDTO> catgegoryDTOS = categories.stream()
-                .map(category -> modelMapper.map(category, CatgegoryDTO.class))
+        List<CategoryDTO> catgegoryDTOS = categories.stream()
+                .map(category -> modelMapper.map(category, CategoryDTO.class))
                 .toList();
 
 
@@ -56,17 +56,25 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void createCategory(Category category) {
+    public CategoryDTO createCategory(CategoryDTO categoryDTO) {
 
-        Category savedCategory = categoryRepository.findByCategoryName(category.getCategoryName());
+        Category category = modelMapper.map(categoryDTO, Category.class);
 
-        if (savedCategory != null) {
+        Category CategoryFromDb = categoryRepository.findByCategoryName(category.getCategoryName());
+
+        if (CategoryFromDb != null) {
             throw new APIException("Category with the name " + category.getCategoryName() + "already exist!!!");
 
         }
 
 
-        categoryRepository.save(category);
+        Category savedCategory = categoryRepository.save(category);
+
+        CategoryDTO savedCategoryDTO = modelMapper.map(savedCategory, CategoryDTO.class);
+
+
+        return savedCategoryDTO;
+
     }
 
     @Override

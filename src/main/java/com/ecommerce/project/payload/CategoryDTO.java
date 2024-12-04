@@ -8,13 +8,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CatgegoryDTO {
+public class CategoryDTO {
 
 
     private  Long categoryId;
 
 
-    private String cagteggoryName;
+    private String categoryName;
 
 
 
