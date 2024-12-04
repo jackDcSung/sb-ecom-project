@@ -2,6 +2,7 @@ package com.ecommerce.project.controller;
 
 
 import com.ecommerce.project.model.Category;
+import com.ecommerce.project.payload.CategoryResponse;
 import com.ecommerce.project.service.CategoryService;
 
 import jakarta.validation.Valid;
@@ -23,14 +24,17 @@ public class CategoryController {
 
     @GetMapping("/public/categories")
     //@RequestMapping(value = "/public/categories", method = RequestMethod.GET)
-    public ResponseEntity<List<Category>> getAllCategories(){
-        List<Category> categories = categoryService.getAllCategories();
-        return new ResponseEntity<>(categories, HttpStatus.OK);
+    public ResponseEntity<CategoryResponse> getAllCategories() {
+
+        CategoryResponse categoryResponse = categoryService.getAllCategories();
+
+
+        return new ResponseEntity<>(categoryResponse, HttpStatus.OK);
     }
 
     @PostMapping("/public/categories")
     //@RequestMapping(value = "/public/categories", method = RequestMethod.POST)
-    public ResponseEntity<String> createCategory(@Valid  @RequestBody Category category){
+    public ResponseEntity<String> createCategory(@Valid @RequestBody Category category) {
         categoryService.createCategory(category);
         return new ResponseEntity<>("Category added successfully", HttpStatus.CREATED);
     }
@@ -43,13 +47,14 @@ public class CategoryController {
 
 
     }
+
     @PutMapping("/public/categories/{categoryId}")
     public ResponseEntity<String> updateCategory(@Valid @RequestBody Category category,
-                                                 @PathVariable Long categoryId){
+                                                 @PathVariable Long categoryId) {
 
-            Category savedCategory = categoryService.updateCategory(category, categoryId);
-            return new ResponseEntity<>("Category with category id: " + categoryId, HttpStatus.OK);
+        Category savedCategory = categoryService.updateCategory(category, categoryId);
+        return new ResponseEntity<>("Category with category id: " + categoryId, HttpStatus.OK);
 
-        }
     }
+}
 
