@@ -15,6 +15,9 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
     List<Product> findByCategoryOrderByPriceAsc(Category category);
 
 
+    List<Product> findByProductNameLikeIgnoreCase(String keyword);
+
+
 
 
 
@@ -30,3 +33,8 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
 
 
 }
+
+
+
+
+

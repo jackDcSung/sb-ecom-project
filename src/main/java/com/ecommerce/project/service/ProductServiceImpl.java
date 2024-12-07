@@ -63,7 +63,6 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse gettAllProducts() {
 
 
-
         //for trasformation
         List<Product> products = productRepository.findAll();
 
@@ -87,15 +86,11 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse searchByCategory(Long categoryId) {
 
 
-
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
 
 
-    List<Product> products=productRepository.findByCategoryOrderByPriceAsc(category);
-
-
-
+        List<Product> products = productRepository.findByCategoryOrderByPriceAsc(category);
 
 
         List<ProductDTO> productDTOS = products.stream()
@@ -111,11 +106,24 @@ public class ProductServiceImpl implements ProductService {
         return productResponse;
 
 
+    }
+
+    @Override
+    public ProductResponse serachProductBykeyword(String keyword) {
 
 
+        List<Product> products = productRepository.findByProductNameLikeIgnoreCase('%'+keyword+'%');
 
 
+        List<ProductDTO> productDTOS = products.stream()
+                .map(product -> modelMapper.map(product, ProductDTO.class))
+                .collect(Collectors.toList());
 
 
+        ProductResponse productResponse = new ProductResponse();
+
+        productResponse.setContent(productDTOS);
+
+        return productResponse;
     }
 }
