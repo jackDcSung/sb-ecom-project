@@ -10,6 +10,7 @@ import com.ecommerce.project.repository.CategoryRepository;
 import com.ecommerce.project.repository.ProductRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,6 +38,14 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private  FileService fileService;
+
+
+    @Value("${project.image}")
+    private  String path;
+
+
 
     @Override
     public ProductDTO addProduct(Long categoryId, ProductDTO productDTO) {
@@ -46,9 +55,7 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
 
         //transfer here
-        Product product=modelMapper.map(productDTO,Product.class);
-
-
+        Product product = modelMapper.map(productDTO, Product.class);
 
 
         product.setImage("default.png");
@@ -147,10 +154,7 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
 
 
-        Product product= modelMapper.map(productDTO, Product.class);
-
-
-
+        Product product = modelMapper.map(productDTO, Product.class);
 
 
         //update the product info with user shared
@@ -187,91 +191,33 @@ public class ProductServiceImpl implements ProductService {
 
 
         //Get the product from FB
-        Product productFromDb=productRepository.findById(producctId)
-                .orElseThrow(()->
-                    new ResourceNotFoundException("Product","productId",producctId));
+        Product productFromDb = productRepository.findById(producctId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Product", "productId", producctId));
 
 
         //Upload image to server
         //Get the file name of uploaded image
+        //after user application.property
 
-        String path="images/";
 
-        String fileName=uploadImage(path,image);
+        //userfileserice
+        String fileName = fileService.uploadImage(path, image);
 
         //updating the new file name th the product
 
         productFromDb.setImage(fileName);
 
 
-
         //Save updated product
-        Product updatedProduct=productRepository.save(productFromDb);
-
-
+        Product updatedProduct = productRepository.save(productFromDb);
 
 
         //return DTO after mapping product to DTO
-        return  modelMapper.map(updatedProduct,ProductDTO.class);
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return modelMapper.map(updatedProduct, ProductDTO.class);
 
 
     }
 
-    private String uploadImage(String path, MultipartFile file) throws IOException {
-
-        //File names of current/original file(note not use getName())
-        String originalFileName=file.getOriginalFilename();
-
-
-        //Generatea unique file name( //avoid same  file name)
-        //random UUID
-        String randomId= UUID.randomUUID().toString();
-        //ex mat.jpg-->1234-->1234.jpg
-        String fileName=randomId.concat(originalFileName.substring(originalFileName.lastIndexOf('.')));
-
-        //for operating system different
-        //note use seperate not pathSeparator
-        String filePath=path+ File.separator+fileName;
-
-
-
-        //Check if path exist and create
-
-        File folder=new File(path);
-        if(!folder.exists()){
-            folder.mkdir();
-        }
-
-
-
-        //Upload to server
-        Files.copy(file.getInputStream(), Paths.get(filePath));
-
-
-        return  fileName;
-
-
-
-
-
-        //returning file name
-
-
-
-
-    }
 
 }
