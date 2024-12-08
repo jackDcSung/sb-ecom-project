@@ -1,6 +1,7 @@
 package com.ecommerce.project.service;
 
 
+import com.ecommerce.project.exceptions.APIException;
 import com.ecommerce.project.exceptions.ResourceNotFoundException;
 import com.ecommerce.project.model.Category;
 import com.ecommerce.project.model.Product;
@@ -39,12 +40,11 @@ public class ProductServiceImpl implements ProductService {
     private ModelMapper modelMapper;
 
     @Autowired
-    private  FileService fileService;
+    private FileService fileService;
 
 
     @Value("${project.image}")
-    private  String path;
-
+    private String path;
 
 
     @Override
@@ -53,32 +53,58 @@ public class ProductServiceImpl implements ProductService {
 
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
+        //check if product already present or not
 
-        //transfer here
-        Product product = modelMapper.map(productDTO, Product.class);
+        boolean isProductNotPresent = true;
 
+        List<Product> products = category.getProducts();
 
-        product.setImage("default.png");
-        product.setCategory(category);
+        for (Product value : products) {
 
+            if (value.getProductName().equals(productDTO.getProductName())) {
 
-        double specialPrice = product.getPrice() -
-                ((product.getDiscount() * 0.01) * product.getPrice());
+                isProductNotPresent = false;
 
+                break;
 
-        product.setSpecialPrice(specialPrice);
+            }
+        }
 
-
-        Product savedProduct = productRepository.save(product);
-
-
-        return modelMapper.map(savedProduct, ProductDTO.class);
+        if(isProductNotPresent) {
 
 
+            //transfer here
+            Product product = modelMapper.map(productDTO, Product.class);
+
+
+            product.setImage("default.png");
+            product.setCategory(category);
+
+
+            double specialPrice = product.getPrice() -
+                    ((product.getDiscount() * 0.01) * product.getPrice());
+
+
+            product.setSpecialPrice(specialPrice);
+
+
+            Product savedProduct = productRepository.save(product);
+
+
+            return modelMapper.map(savedProduct, ProductDTO.class);
+
+        }else{
+
+            throw
+                     new APIException("PRoduct already exist");
+        }
     }
 
     @Override
     public ProductResponse gettAllProducts() {
+
+        //check if product is 0 or not
+
 
 
         //for trasformation
@@ -88,6 +114,19 @@ public class ProductServiceImpl implements ProductService {
         List<ProductDTO> productDTOS = products.stream()
                 .map(product -> modelMapper.map(product, ProductDTO.class))
                 .collect(Collectors.toList());
+
+
+        if(products.isEmpty()){
+
+
+
+            throw new APIException("No PRoducts Exist!!");
+        }
+
+
+
+
+
 
 
         ProductResponse productResponse = new ProductResponse();
@@ -170,6 +209,8 @@ public class ProductServiceImpl implements ProductService {
 
 
         return modelMapper.map(savedProduct, ProductDTO.class);
+
+
 
 
     }

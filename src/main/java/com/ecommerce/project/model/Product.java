@@ -1,6 +1,8 @@
 package com.ecommerce.project.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +18,10 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private  Long productId;
 
+
+
+    @NotBlank
+    @Size(min=3,message = "Product description  name must contain atleast  6 charactor")
     private  String productName;
 
 
