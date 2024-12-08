@@ -26,4 +26,8 @@ public interface CartService {
     @Query("delete  from  CartItem  ci where ci.cart=?1 and ci.product.id=?2")
     String deleteProductFromCart(Long cartId, Long productId);
 
+
+    void updateProductInCarts(Long cartId, Long productId);
+
+
 }
