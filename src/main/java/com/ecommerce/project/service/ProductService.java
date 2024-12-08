@@ -13,12 +13,12 @@ public interface ProductService {
     ProductDTO addProduct(Long categoryId, ProductDTO product);
 
 
-    ProductResponse gettAllProducts();
+    ProductResponse gettAllProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
 
-    ProductResponse searchByCategory(Long categoryId);
+    ProductResponse searchByCategory(Long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
-    ProductResponse serachProductBykeyword(String keyword);
+    ProductResponse serachProductBykeyword(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
     ProductDTO updateProduct(Long productId, ProductDTO product);
 
