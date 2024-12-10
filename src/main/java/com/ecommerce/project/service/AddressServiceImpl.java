@@ -5,13 +5,13 @@ import com.ecommerce.project.model.Address;
 import com.ecommerce.project.model.User;
 import com.ecommerce.project.payload.AddressDTO;
 import com.ecommerce.project.repositories.AddressRepository;
+import com.ecommerce.project.repositories.UserRepository;
 import com.ecommerce.project.util.AuthUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class AddressServiceImpl implements AddressService {
@@ -25,6 +25,8 @@ public class AddressServiceImpl implements AddressService {
 
     @Autowired
     AddressRepository addressRepository;
+    @Autowired
+    private UserRepository userRepository;
 
 
     @Override
@@ -77,7 +79,7 @@ public class AddressServiceImpl implements AddressService {
     public List<AddressDTO> getUserAddresses(User user) {
 
         //note here
-        List<Address> addresses =user.getAddresses();
+        List<Address> addresses = user.getAddresses();
 
 
         return addresses.stream()
@@ -85,5 +87,45 @@ public class AddressServiceImpl implements AddressService {
                 .toList();
 
 
+    }
+
+    @Override
+    public AddressDTO updateAddress(Long addressId, AddressDTO addressDTO) {
+
+
+        Address addressFromDatabase = addressRepository.findById(addressId)
+                .orElseThrow(() -> new ResourceNotFoundException("Address", "addressId", addressId));
+
+
+        addressFromDatabase.setCity(addressDTO.getCity());
+
+
+        addressFromDatabase.setPincode(addressDTO.getPincode());
+
+        addressFromDatabase.setState(addressDTO.getState());
+
+        addressFromDatabase.setCountry(addressDTO.getCountry());
+
+
+        addressFromDatabase.setStreet(addressDTO.getStreet());
+
+
+        addressFromDatabase.setBuildingName(addressDTO.getBuildingName());
+
+
+        //note here
+        Address updatedAddress = addressRepository.save(addressFromDatabase);
+
+
+        User user = addressFromDatabase.getUser();
+
+        user.getAddresses().removeIf(address -> address.getAddressId().equals(addressId));
+
+        user.getAddresses().add(updatedAddress);
+
+        userRepository.save(user);
+
+
+        return modelMapper.map(updatedAddress, AddressDTO.class);
     }
 }
