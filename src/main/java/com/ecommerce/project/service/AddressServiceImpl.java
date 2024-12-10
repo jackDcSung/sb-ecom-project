@@ -62,7 +62,6 @@ public class AddressServiceImpl implements AddressService {
     }
 
 
-
     @Override
     public AddressDTO getAddressById(Long addressId) {
 
@@ -70,7 +69,21 @@ public class AddressServiceImpl implements AddressService {
                 .orElseThrow(() -> new ResourceNotFoundException("Address", "addressId", addressId));
 
 
-        return  modelMapper.map(address, AddressDTO.class);
+        return modelMapper.map(address, AddressDTO.class);
+
+    }
+
+    @Override
+    public List<AddressDTO> getUserAddresses(User user) {
+
+        //note here
+        List<Address> addresses =user.getAddresses();
+
+
+        return addresses.stream()
+                .map(myadddress -> modelMapper.map(myadddress, AddressDTO.class))
+                .toList();
+
 
     }
 }
