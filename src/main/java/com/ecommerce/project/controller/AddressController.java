@@ -90,5 +90,24 @@ public class AddressController {
 
     }
 
+    @DeleteMapping("/addresses/{addressId}")
+    public ResponseEntity<String> updateAddressById(@PathVariable Long addressId) {
+
+
+        String status = addressService.deleteAddress(addressId);
+
+
+        return new ResponseEntity<>(status, HttpStatus.OK);
+
+    }
+
+
+
+
+
+
+
+
+
 
 }
